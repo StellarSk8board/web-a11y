@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web A11y</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #242838;
+      --border: #2e3347;
+      --accent: #E85D04;
+      --accent-dim: #c44d03;
+      --text: #e8e6e3;
+      --text-dim: #8b8d98;
+      --green: #22c55e;
+      --yellow: #eab308;
+      --red: #ef4444;
+      --radius: 12px;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    /* ── Screens ────────────────────────────────────────────────────────── */
+
+    .screen { display: none; width: 100%; max-width: 680px; }
+    .screen.active { display: block; }
+
+    /* ── Welcome Screen ─────────────────────────────────────────────────── */
+
+    .logo {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .logo-mark {
+      width: 72px;
+      height: 72px;
+      background: var(--accent);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 36px;
+    }
+
+    .logo h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .logo p {
+      color: var(--text-dim);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    /* ── Drop Zone ─────────────────────────────────────────────────────── */
+
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 48px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(232, 93, 4, 0.06);
+    }
+
+    .drop-zone input[type="file"],
+    .drop-zone input[type="directory"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .drop-icon {
+      font-size: 40px;
+      margin-bottom: 16px;
+      opacity: 0.6;
+    }
+
+    .drop-zone h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .drop-zone p {
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+
+    .or-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+
+    .or-divider::before,
+    .or-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Options ───────────────────────────────────────────────────────── */
+
+    .options {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .options-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 14px;
+    }
+
+    .option-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .option-row:last-child { margin-bottom: 0; }
+
+    .option-row label {
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .radio-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    input[type="checkbox"],
+    input[type="radio"] {
+      accent-color: var(--accent);
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ── Buttons ───────────────────────────────────────────────────────── */
+
+    .btn-primary {
+      width: 100%;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      padding: 14px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary:hover { background: var(--accent-dim); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-secondary {
+      width: 100%;
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 12px;
+    }
+
+    .btn-secondary:hover { background: var(--border); }
+
+    /* ── Ollama Status ────────────────────────────────────────────────── */
+
+    .ollama-status {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ollama-status .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot.green { background: var(--green); }
+    .dot.yellow { background: var(--yellow); }
+    .dot.red { background: var(--red); }
+
+    /* ── Progress Screen ───────────────────────────────────────────────── */
+
+    .progress-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px 24px;
+      text-align: center;
+    }
+
+    .progress-card h2 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .progress-card p {
+      color: var(--text-dim);
+      font-size: 13px;
+      margin-bottom: 24px;
+    }
+
+    .progress-bar-wrap {
+      background: var(--surface2);
+      border-radius: 100px;
+      height: 8px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 100px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    .progress-steps {
+      text-align: left;
+    }
+
+    .progress-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      font-size: 13px;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .progress-step:last-child { border-bottom: none; }
+
+    .step-icon {
+      width: 20px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .step-icon.done { color: var(--green); }
+    .step-icon.active { color: var(--accent); }
+    .step-icon.pending { color: var(--text-dim); }
+
+    /* ── Results Screen ────────────────────────────────────────────────── */
+
+    .results-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .results-header .check-circle {
+      width: 64px;
+      height: 64px;
+      background: rgba(34, 197, 94, 0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 16px;
+    }
+
+    .results-header h2 {
+      font-size: 22px;
+      margin-bottom: 4px;
+    }
+
+    .results-header p {
+      color: var(--text-dim);
+      font-size: 14px;
+    }
+
+    .results-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 12px;
+      text-align: center;
+    }
+
+    .stat-card .number {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .stat-card .label {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    .results-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* ── Report ────────────────────────────────────────────────────────── */
+
+    .report-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-dim);
+      font-size: 13px;
+      padding: 10px;
+      width: 100%;
+      cursor: pointer;
+      text-align: left;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .report-content {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-top: 12px;
+      padding: 16px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-size: 13px;
+    }
+
+    .report-content.open { display: block; }
+
+    .fix-item {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .fix-item:last-child { border-bottom: none; }
+
+    .fix-rule {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .fix-detail { color: var(--text); line-height: 1.5; }
+    .fix-file { color: var(--text-dim); font-size: 12px; margin-top: 4px; }
+
+    .fix-type {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-right: 6px;
+    }
+
+    .fix-type.fixed { background: rgba(34, 197, 94, 0.15); color: var(--green); }
+    .fix-type.flagged { background: rgba(234, 179, 8, 0.15); color: var(--yellow); }
+    .fix-type.ai_needed { background: rgba(232, 93, 4, 0.15); color: var(--accent); }
+
+    .ai-status-banner {
+      background: rgba(234, 179, 8, 0.1);
+      border: 1px solid rgba(234, 179, 8, 0.3);
+      border-radius: var(--radius);
+      padding: 12px;
+      font-size: 13px;
+      color: var(--yellow);
+      margin-bottom: 16px;
+    }
+
+    .ai-status-banner.error {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: var(--red);
+    }
+
+    /* ── Accessibility: Skip Link ────────────────────────────────────── */
+
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 0;
+      background: var(--accent);
+      color: white;
+      padding: 8px 16px;
+      z-index: 1000;
+      text-decoration: none;
+      border-radius: 0 0 8px 0;
+      font-weight: 600;
+    }
+
+    .skip-link:focus { top: 0; }
+
+    /* ── Scrollbar ─────────────────────────────────────────────────────── */
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <!-- ── Welcome Screen ─────────────────────────────────────────────────── -->
+  <main id="main">
+    <div id="screen-welcome" class="screen active" role="main">
+
+      <div class="logo">
+        <div class="logo-mark" aria-hidden="true">♿</div>
+        <h1>Web A11y</h1>
+        <p>Make any website accessible — WCAG 2.2 compliant.<br>One drag. One button. Done.</p>
+      </div>
+
+      <div class="ollama-status" id="ollama-status" aria-live="polite">
+        <span class="dot yellow"></span>
+        <span id="ollama-msg">Checking AI model...</span>
+      </div>
+
+      <!-- Drop zone: folder -->
+      <div class="drop-zone" id="drop-zone" role="button" tabindex="0" aria-label="Drop website folder here or click to browse">
+        <input type="file" id="folder-input" webkitdirectory multiple aria-label="Select website folder">
+        <div class="drop-icon" aria-hidden="true">📁</div>
+        <h3>Drop your website folder here</h3>
+        <p>HTML, CSS, JS — any format. We'll make it accessible.</p>
+      </div>
+
+      <div class="or-divider">or</div>
+
+      <!-- Drop zone: ZIP -->
+      <div class="drop-zone" id="drop-zip" role="button" tabindex="0" aria-label="Drop ZIP file here or click to browse">
+        <input type="file" id="zip-input" accept=".zip" aria-label="Select website ZIP file">
+        <div class="drop-icon" aria-hidden="true">📦</div>
+        <h3>Drop a website ZIP file here</h3>
+        <p>Works with WordPress exports, Webflow, and any CMS export.</p>
+      </div>
+
+      <div class="options">
+        <div class="options-title">Options</div>
+
+        <div class="radio-group" role="group" aria-label="WCAG compliance level">
+          <label class="radio-label">
+            <input type="radio" name="level" value="AA" checked>
+            WCAG 2.2 AA
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="level" value="AAA">
+            WCAG 2.2 AAA
+          </label>
+        </div>
+
+        <div class="option-row">
+          <input type="checkbox" id="neuro-mode" checked>
+          <label for="neuro-mode">Neurodiversity-friendly mode</label>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="btn-start" disabled aria-label="Start accessibility check">
+        ♿&nbsp;&nbsp;Make Accessible
+      </button>
+
+      <p style="text-align:center; color: var(--text-dim); font-size: 12px; margin-top: 16px;">
+        Everything runs locally. Your files never leave your device.
+      </p>
+    </div>
+
+    <!-- ── Progress Screen ───────────────────────────────────────────────── -->
+    <div id="screen-progress" class="screen" role="main">
+      <div class="progress-card">
+        <h2>Making your website accessible...</h2>
+        <p id="progress-subtitle">Analyzing files</p>
+
+        <div class="progress-bar-wrap" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Accessibility progress">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <div class="progress-steps" id="progress-steps" aria-live="polite">
+          <div class="progress-step" data-step="analyzing">
+            <span class="step-icon">○</span>
+            <span>Analyzing file structure</span>
+          </div>
+          <div class="progress-step" data-step="rules">
+            <span class="step-icon">○</span>
+            <span>Applying WCAG rules</span>
+          </div>
+          <div class="progress-step" data-step="ai">
+            <span class="step-icon">○</span>
+            <span>AI review (local model)</span>
+          </div>
+          <div class="progress-step" data-step="quality_gate">
+            <span class="step-icon">○</span>
+            <span>Quality gate check</span>
+          </div>
+          <div class="progress-step" data-step="packaging">
+            <span class="step-icon">○</span>
+            <span>Packaging accessible site</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Results Screen ───────────────────────────────────────────────── -->
+    <div id="screen-results" class="screen" role="main">
+      <div class="results-header">
+        <div class="check-circle" aria-hidden="true">✓</div>
+        <h2>Accessibility complete</h2>
+        <p id="results-summary">Your website is now accessible.</p>
+      </div>
+
+      <div class="results-stats" id="results-stats" aria-label="Accessibility summary">
+        <div class="stat-card">
+          <div class="number" id="stat-fixed">0</div>
+          <div class="label">Issues fixed</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" id="stat-flagged">0</div>
+          <div class="label">Flagged for review</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" id="stat-ai">0</div>
+          <div class="label">AI enhanced</div>
+        </div>
+      </div>
+
+      <div id="ai-banner"></div>
+
+      <div class="results-actions">
+        <button class="btn-primary" id="btn-download" aria-label="Download accessible website as ZIP">
+          ⬇&nbsp;&nbsp;Download Accessible Website
+        </button>
+        <button class="btn-secondary" id="btn-new" aria-label="Process another website">
+          ♻&nbsp;&nbsp;Process Another Website
+        </button>
+      </div>
+
+      <button class="report-toggle" id="btn-report" aria-expanded="false" aria-controls="report-content">
+        <span>📋 View Full Report</span>
+        <span id="report-arrow">▼</span>
+      </button>
+      <div class="report-content" id="report-content" role="region" aria-label="Accessibility report">
+        <div id="report-list"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

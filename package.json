@@ -1,0 +1,49 @@
+{
+  "name": "web-a11y",
+  "version": "0.1.0",
+  "description": "Web A11y — One drag. One button. Accessible.",
+  "homepage": "https://github.com/StellarSk8board/web-a11y",
+  "main": "src/main.js",
+  "author": {
+    "name": "Ethos",
+    "email": "ethos@eythosfound.org"
+  },
+  "license": "Apache-2.0",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "org.ethos.web-a11y",
+    "productName": "Web A11y",
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "target": ["dmg", "zip"]
+    },
+    "win": {
+      "target": ["nsis", "portable"]
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Development",
+      "maintainer": "Ethos <ethos@eythosfound.org>"
+    },
+    "files": [
+      "src/**/*",
+      "node_modules/**/*"
+    ]
+  },
+  "dependencies": {
+    "jszip": "^3.10.1"
+  },
+  "devDependencies": {
+    "electron": "^35.0.0",
+    "electron-builder": "^25.1.8"
+  }
+}
