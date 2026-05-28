@@ -90,4 +90,4 @@ Apache License 2.0 — see [LICENSE](LICENSE)
 
 ---
 
-Built with care by the [Ethos](https://github.com/Eythos) team.
+Built with care by the [Eythos](https://github.com/Eythos) team.
